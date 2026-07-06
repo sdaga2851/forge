@@ -3239,6 +3239,137 @@ function Tasks({
     }
   }))));
 }
+
+// ── HABIT FORM (top-level — stable identity across re-renders) ──────────────
+function HabitForm({
+  f,
+  setF,
+  col,
+  CATS,
+  ICON_MAP,
+  ALL_DAYS,
+  FREQ_OPTS,
+  toggleFreqDay,
+  onSave,
+  onCancel,
+  saveLabel
+}) {
+  const icons = ICON_MAP[f.cat] || ICON_MAP.Custom;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Category"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap"
+    }
+  }, CATS.map(c => /*#__PURE__*/React.createElement("button", {
+    key: c,
+    onClick: () => setF(p => ({
+      ...p,
+      cat: c,
+      icon: ICON_MAP[c]?.[0] || "⭐"
+    })),
+    style: {
+      padding: "6px 10px",
+      borderRadius: 99,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 11,
+      fontWeight: 700,
+      background: f.cat === c ? col : "#F3F4F6",
+      color: f.cat === c ? "#fff" : C.sub,
+      transition: "all .15s"
+    }
+  }, c)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Icon"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap"
+    }
+  }, icons.map(ic => /*#__PURE__*/React.createElement("button", {
+    key: ic,
+    onClick: () => setF(p => ({
+      ...p,
+      icon: ic
+    })),
+    style: {
+      width: 38,
+      height: 38,
+      borderRadius: 10,
+      border: `2px solid ${f.icon === ic ? col : C.border}`,
+      background: f.icon === ic ? col + "15" : "#fff",
+      cursor: "pointer",
+      fontSize: 20,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all .15s"
+    }
+  }, ic)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Habit name"), /*#__PURE__*/React.createElement(Inp, {
+    v: f.name,
+    set: v => setF(p => ({
+      ...p,
+      name: v
+    })),
+    ph: "e.g. Morning walk 30 min"
+  })), /*#__PURE__*/React.createElement(G2, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Reminder time"), /*#__PURE__*/React.createElement(Inp, {
+    type: "time",
+    v: f.time,
+    set: v => setF(p => ({
+      ...p,
+      time: v
+    }))
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Frequency"), /*#__PURE__*/React.createElement(Sel, {
+    v: f.freq,
+    set: v => setF(p => ({
+      ...p,
+      freq: v
+    }))
+  }, FREQ_OPTS.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o.v,
+    value: o.v
+  }, o.l))))), f.freq === "days" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Which days?"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6
+    }
+  }, ALL_DAYS.map(d => /*#__PURE__*/React.createElement("button", {
+    key: d,
+    onClick: () => toggleFreqDay(d),
+    style: {
+      flex: 1,
+      padding: "8px 2px",
+      borderRadius: 8,
+      border: "none",
+      cursor: "pointer",
+      fontSize: 11,
+      fontWeight: 700,
+      background: f.days.includes(d) ? col : "#F3F4F6",
+      color: f.days.includes(d) ? "#fff" : C.sub,
+      transition: "all .15s"
+    }
+  }, d.slice(0, 1))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Note (opt)"), /*#__PURE__*/React.createElement(Inp, {
+    v: f.note,
+    set: v => setF(p => ({
+      ...p,
+      note: v
+    })),
+    ph: "Any context…"
+  })), /*#__PURE__*/React.createElement(SBtn, {
+    label: saveLabel,
+    color: col,
+    onClick: onSave
+  }), /*#__PURE__*/React.createElement(SBtn, {
+    label: "Cancel",
+    ghost: true,
+    onClick: onCancel
+  }));
+}
 function Habits({
   habits,
   set,
@@ -3389,127 +3520,6 @@ function Habits({
       }
     }, h.days.join("·"));
     return null;
-  }
-  function HabitForm({
-    onSave,
-    onCancel,
-    saveLabel
-  }) {
-    const icons = ICON_MAP[f.cat] || ICON_MAP.Custom;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        flexDirection: "column",
-        gap: 14
-      }
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Category"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 6,
-        flexWrap: "wrap"
-      }
-    }, CATS.map(c => /*#__PURE__*/React.createElement("button", {
-      key: c,
-      onClick: () => setF(p => ({
-        ...p,
-        cat: c,
-        icon: ICON_MAP[c]?.[0] || "⭐"
-      })),
-      style: {
-        padding: "6px 10px",
-        borderRadius: 99,
-        border: "none",
-        cursor: "pointer",
-        fontSize: 11,
-        fontWeight: 700,
-        background: f.cat === c ? col : "#F3F4F6",
-        color: f.cat === c ? "#fff" : C.sub,
-        transition: "all .15s"
-      }
-    }, c)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Icon"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 8,
-        flexWrap: "wrap"
-      }
-    }, icons.map(ic => /*#__PURE__*/React.createElement("button", {
-      key: ic,
-      onClick: () => setF(p => ({
-        ...p,
-        icon: ic
-      })),
-      style: {
-        width: 38,
-        height: 38,
-        borderRadius: 10,
-        border: `2px solid ${f.icon === ic ? col : C.border}`,
-        background: f.icon === ic ? col + "15" : "#fff",
-        cursor: "pointer",
-        fontSize: 20,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "all .15s"
-      }
-    }, ic)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Habit name"), /*#__PURE__*/React.createElement(Inp, {
-      v: f.name,
-      set: v => setF(p => ({
-        ...p,
-        name: v
-      })),
-      ph: "e.g. Morning walk 30 min"
-    })), /*#__PURE__*/React.createElement(G2, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Reminder time"), /*#__PURE__*/React.createElement(Inp, {
-      type: "time",
-      v: f.time,
-      set: v => setF(p => ({
-        ...p,
-        time: v
-      }))
-    })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Frequency"), /*#__PURE__*/React.createElement(Sel, {
-      v: f.freq,
-      set: v => setF(p => ({
-        ...p,
-        freq: v
-      }))
-    }, FREQ_OPTS.map(o => /*#__PURE__*/React.createElement("option", {
-      key: o.v,
-      value: o.v
-    }, o.l))))), f.freq === "days" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Which days?"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 6
-      }
-    }, ALL_DAYS.map(d => /*#__PURE__*/React.createElement("button", {
-      key: d,
-      onClick: () => toggleFreqDay(d),
-      style: {
-        flex: 1,
-        padding: "8px 2px",
-        borderRadius: 8,
-        border: "none",
-        cursor: "pointer",
-        fontSize: 11,
-        fontWeight: 700,
-        background: f.days.includes(d) ? col : "#F3F4F6",
-        color: f.days.includes(d) ? "#fff" : C.sub,
-        transition: "all .15s"
-      }
-    }, d.slice(0, 1))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Lbl, null, "Note (opt)"), /*#__PURE__*/React.createElement(Inp, {
-      v: f.note,
-      set: v => setF(p => ({
-        ...p,
-        note: v
-      })),
-      ph: "Any context…"
-    })), /*#__PURE__*/React.createElement(SBtn, {
-      label: saveLabel,
-      color: col,
-      onClick: onSave
-    }), /*#__PURE__*/React.createElement(SBtn, {
-      label: "Cancel",
-      ghost: true,
-      onClick: onCancel
-    }));
   }
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Hdr, {
     title: "Routines",
@@ -3798,6 +3808,14 @@ function Habits({
     },
     title: "New Routine"
   }, /*#__PURE__*/React.createElement(HabitForm, {
+    f: f,
+    setF: setF,
+    col: col,
+    CATS: CATS,
+    ICON_MAP: ICON_MAP,
+    ALL_DAYS: ALL_DAYS,
+    FREQ_OPTS: FREQ_OPTS,
+    toggleFreqDay: toggleFreqDay,
     onSave: addHabit,
     onCancel: () => {
       setSheet(false);
@@ -3812,6 +3830,14 @@ function Habits({
     },
     title: "Edit Routine"
   }, /*#__PURE__*/React.createElement(HabitForm, {
+    f: f,
+    setF: setF,
+    col: col,
+    CATS: CATS,
+    ICON_MAP: ICON_MAP,
+    ALL_DAYS: ALL_DAYS,
+    FREQ_OPTS: FREQ_OPTS,
+    toggleFreqDay: toggleFreqDay,
     onSave: saveEdit,
     onCancel: () => {
       setEditSheet(null);
@@ -8693,6 +8719,121 @@ function JournalPage({
 }
 
 // ── QUICK NOTES ────────────────────────────────────────────────────────────────
+// ── NOTE ITEM (top-level — stable identity across re-renders) ───────────────
+function NoteItem({
+  n,
+  col,
+  editId,
+  editText,
+  setEditText,
+  startEdit,
+  saveEdit,
+  setEditId,
+  toggle,
+  pin,
+  del
+}) {
+  return /*#__PURE__*/React.createElement(Card, {
+    style: {
+      padding: "12px 14px",
+      marginBottom: 8,
+      borderLeft: n.pinned ? `3px solid ${C.warn}` : "none",
+      borderRadius: n.pinned ? `0 ${R}px ${R}px 0` : `${R}px`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement(Tick, {
+    on: n.done,
+    toggle: () => toggle(n.id),
+    color: col
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, editId === n.id ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: editText,
+    onChange: e => setEditText(e.target.value),
+    autoFocus: true,
+    onKeyDown: e => {
+      if (e.key === "Enter") saveEdit();
+      if (e.key === "Escape") {
+        setEditId(null);
+        setEditText("");
+      }
+    },
+    style: {
+      flex: 1,
+      padding: "8px 10px",
+      border: `1.5px solid ${col}`,
+      borderRadius: 8,
+      fontSize: 14,
+      outline: "none"
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: saveEdit,
+    style: {
+      background: col,
+      color: "#fff",
+      border: "none",
+      borderRadius: 8,
+      padding: "6px 10px",
+      fontWeight: 700,
+      fontSize: 12,
+      cursor: "pointer"
+    }
+  }, "✓")) : /*#__PURE__*/React.createElement("div", {
+    onClick: () => startEdit(n),
+    style: {
+      fontSize: 14,
+      fontWeight: 500,
+      color: n.done ? C.mute : C.text,
+      textDecoration: n.done ? "line-through" : "none",
+      lineHeight: 1.4,
+      cursor: "pointer"
+    }
+  }, n.text), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.mute,
+      marginTop: 3
+    }
+  }, fmtDate(n.created))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 2
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => pin(n.id),
+    style: {
+      background: "none",
+      border: "none",
+      color: n.pinned ? C.warn : C.mute,
+      fontSize: 14,
+      cursor: "pointer",
+      padding: "4px 5px"
+    }
+  }, n.pinned ? "📌" : "📍"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => del(n.id),
+    style: {
+      background: "none",
+      border: "none",
+      color: C.mute,
+      fontSize: 14,
+      cursor: "pointer",
+      padding: "4px 5px"
+    }
+  }, "✕"))));
+}
 function QuickNotes({
   quickNotes,
   setQuickNotes
@@ -8744,110 +8885,6 @@ function QuickNotes({
   const active = quickNotes.filter(n => !n.pinned && !n.done);
   const done = quickNotes.filter(n => n.done);
   const show = filter === "all" ? [...pinned, ...active] : filter === "done" ? done : pinned;
-  function NoteItem({
-    n
-  }) {
-    return /*#__PURE__*/React.createElement(Card, {
-      style: {
-        padding: "12px 14px",
-        marginBottom: 8,
-        borderLeft: n.pinned ? `3px solid ${C.warn}` : "none",
-        borderRadius: n.pinned ? `0 ${R}px ${R}px 0` : `${R}px`
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 10
-      }
-    }, /*#__PURE__*/React.createElement(Tick, {
-      on: n.done,
-      toggle: () => toggle(n.id),
-      color: col
-    }), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1,
-        minWidth: 0
-      }
-    }, editId === n.id ? /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 6
-      }
-    }, /*#__PURE__*/React.createElement("input", {
-      value: editText,
-      onChange: e => setEditText(e.target.value),
-      autoFocus: true,
-      onKeyDown: e => {
-        if (e.key === "Enter") saveEdit();
-        if (e.key === "Escape") {
-          setEditId(null);
-          setEditText("");
-        }
-      },
-      style: {
-        flex: 1,
-        padding: "8px 10px",
-        border: `1.5px solid ${col}`,
-        borderRadius: 8,
-        fontSize: 14,
-        outline: "none"
-      }
-    }), /*#__PURE__*/React.createElement("button", {
-      onClick: saveEdit,
-      style: {
-        background: col,
-        color: "#fff",
-        border: "none",
-        borderRadius: 8,
-        padding: "6px 10px",
-        fontWeight: 700,
-        fontSize: 12,
-        cursor: "pointer"
-      }
-    }, "✓")) : /*#__PURE__*/React.createElement("div", {
-      onClick: () => startEdit(n),
-      style: {
-        fontSize: 14,
-        fontWeight: 500,
-        color: n.done ? C.mute : C.text,
-        textDecoration: n.done ? "line-through" : "none",
-        lineHeight: 1.4,
-        cursor: "pointer"
-      }
-    }, n.text), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: C.mute,
-        marginTop: 3
-      }
-    }, fmtDate(n.created))), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 2
-      }
-    }, /*#__PURE__*/React.createElement("button", {
-      onClick: () => pin(n.id),
-      style: {
-        background: "none",
-        border: "none",
-        color: n.pinned ? C.warn : C.mute,
-        fontSize: 14,
-        cursor: "pointer",
-        padding: "4px 5px"
-      }
-    }, n.pinned ? "📌" : "📍"), /*#__PURE__*/React.createElement("button", {
-      onClick: () => del(n.id),
-      style: {
-        background: "none",
-        border: "none",
-        color: C.mute,
-        fontSize: 14,
-        cursor: "pointer",
-        padding: "4px 5px"
-      }
-    }, "✕"))));
-  }
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Hdr, {
     title: "Quick Notes",
     sub: "Capture ideas instantly",
@@ -8973,7 +9010,17 @@ function QuickNotes({
     }
   }, "📌 Pinned"), pinned.map(n => /*#__PURE__*/React.createElement(NoteItem, {
     key: n.id,
-    n: n
+    n: n,
+    col: col,
+    editId: editId,
+    editText: editText,
+    setEditText: setEditText,
+    startEdit: startEdit,
+    saveEdit: saveEdit,
+    setEditId: setEditId,
+    toggle: toggle,
+    pin: pin,
+    del: del
   }))), filter === "all" && active.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 14
@@ -8989,10 +9036,30 @@ function QuickNotes({
     }
   }, "Recent"), active.map(n => /*#__PURE__*/React.createElement(NoteItem, {
     key: n.id,
-    n: n
+    n: n,
+    col: col,
+    editId: editId,
+    editText: editText,
+    setEditText: setEditText,
+    startEdit: startEdit,
+    saveEdit: saveEdit,
+    setEditId: setEditId,
+    toggle: toggle,
+    pin: pin,
+    del: del
   }))), (filter === "done" || filter === "pinned") && show.map(n => /*#__PURE__*/React.createElement(NoteItem, {
     key: n.id,
-    n: n
+    n: n,
+    col: col,
+    editId: editId,
+    editText: editText,
+    setEditText: setEditText,
+    startEdit: startEdit,
+    saveEdit: saveEdit,
+    setEditId: setEditId,
+    toggle: toggle,
+    pin: pin,
+    del: del
   })));
 }
 
