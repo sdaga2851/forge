@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": false,
+  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/.well-known/assetlinks.json",
