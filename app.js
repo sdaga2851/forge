@@ -2677,6 +2677,7 @@ function Tasks({
   setTasks,
   initialCat
 }) {
+  tasks = Array.isArray(tasks) ? tasks : [];
   const [filter, setFilter] = useState(initialCat || "all");
   const [sortBy, setSortBy] = useState("priority");
   const [sheet, setSheet] = useState(false);
@@ -3376,6 +3377,8 @@ function Habits({
   habitLog,
   setHabitLog
 }) {
+  habits = Array.isArray(habits) ? habits : [];
+  habitLog = habitLog && typeof habitLog === "object" ? habitLog : {};
   const col = SEC.habits.c;
   const [view, setView] = useState("today");
   const [sheet, setSheet] = useState(false);
@@ -4538,6 +4541,7 @@ function Shopping({
   items,
   set
 }) {
+  items = Array.isArray(items) ? items : [];
   const [cat, setCat] = useState("All");
   const [sheet, setSheet] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -4757,6 +4761,7 @@ function Family({
   family,
   set
 }) {
+  family = Array.isArray(family) ? family : [];
   const [who, setWho] = useState("wife");
   const col = SEC.family.c;
   const fd = family.find(f => f.member === who);
@@ -5553,6 +5558,7 @@ function Travel({
   travel,
   set
 }) {
+  travel = Array.isArray(travel) ? travel : [];
   const col = SEC.travel.c;
   const [filter, setFilter] = useState("All");
   const [sheet, setSheet] = useState(false);
@@ -8352,6 +8358,7 @@ function JournalPage({
   setJournal
 }) {
   const col = SEC.journal.c;
+  journal = Array.isArray(journal) ? journal : []; // guard: never crash on corrupted data
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState(null); // viewing a single entry
   const [editId, setEditId] = useState(null);
@@ -8838,6 +8845,7 @@ function QuickNotes({
   quickNotes,
   setQuickNotes
 }) {
+  quickNotes = Array.isArray(quickNotes) ? quickNotes : [];
   const col = SEC.notes.c;
   const [text, setText] = useState("");
   const [filter, setFilter] = useState("all");
@@ -9540,6 +9548,53 @@ function InstallBanner(){
       style:{background:'none',border:'none',color:'rgba(255,255,255,.5)',fontSize:18,cursor:'pointer',padding:'4px'}},'✕')
   );
 }
+
+// ── ERROR BOUNDARY ───────────────────────────────────────────────────────────
+// Catches any render crash in any section and shows a recoverable screen
+// instead of a dead blank page. "Back to Home" clears the broken section's
+// saved tab so a bad state can't immediately re-trigger the same crash.
+class ErrorBoundary extends React.Component {
+  constructor(props){
+    super(props);
+    this.state={hasError:false,message:''};
+  }
+  static getDerivedStateFromError(err){
+    return{hasError:true,message:(err&&err.message)?err.message:'Unknown error'};
+  }
+  componentDidCatch(err,info){
+    try{console.error('Forge crashed:',err,info);}catch(e){}
+  }
+  handleReset(){
+    try{
+      localStorage.setItem('lifeos_tab', JSON.stringify('dashboard'));
+    }catch(e){}
+    this.setState({hasError:false,message:''});
+    window.location.reload();
+  }
+  render(){
+    if(this.state.hasError){
+      return React.createElement('div',{style:{
+        minHeight:'100vh',minHeight:'100dvh',display:'flex',flexDirection:'column',
+        alignItems:'center',justifyContent:'center',padding:'32px 24px',
+        background:'#F9FAFB',fontFamily:"'Inter',system-ui,sans-serif",textAlign:'center'}},
+        React.createElement('div',{style:{fontSize:40,marginBottom:16}},'⚠️'),
+        React.createElement('div',{style:{fontSize:17,fontWeight:800,color:'#111318',marginBottom:8}},
+          'Something went wrong'),
+        React.createElement('div',{style:{fontSize:13,color:'#6B7280',marginBottom:24,lineHeight:1.6,maxWidth:280}},
+          'This section hit an error and couldn\\'t load. Your tasks, habits, and other data are safe — tap below to return home.'),
+        React.createElement('button',{
+          onClick:()=>this.handleReset(),
+          style:{background:'#111318',color:'#fff',border:'none',borderRadius:12,
+            padding:'13px 28px',fontWeight:700,fontSize:14,cursor:'pointer'}},
+          'Back to Home'),
+        React.createElement('div',{style:{fontSize:10,color:'#B0B8C8',marginTop:20,maxWidth:280,wordBreak:'break-word'}},
+          this.state.message)
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function PersistentApp(){
   const [habits,       setHabits      ]=useLS('habits',       SEED.habits);
   const [biz,          setBiz         ]=useLS('biz',          SEED.business);
@@ -9626,7 +9681,9 @@ function PersistentApp(){
             padding:'5px 8px',fontSize:16,cursor:'pointer'}},'📝')
       )
     ),
-    React.createElement('div',{style:{flex:1,overflowY:'auto',padding:'16px 14px 96px'}},renderPage()),
+    React.createElement('div',{style:{flex:1,overflowY:'auto',padding:'16px 14px 96px'}},
+      React.createElement(ErrorBoundary,null,renderPage())
+    ),
     React.createElement('div',{style:{position:'fixed',bottom:0,left:'50%',transform:'translateX(-50%)',
       width:'100%',maxWidth:430,background:'rgba(255,255,255,.96)',backdropFilter:'blur(12px)',
       borderTop:`1px solid ${C.border}`,display:'flex',zIndex:100}},
@@ -9661,9 +9718,11 @@ function PersistentApp(){
   );
 }
 function Root(){
-  return React.createElement(React.Fragment,null,
-    React.createElement(PersistentApp,null),
-    React.createElement(InstallBanner,null)
+  return React.createElement(ErrorBoundary,null,
+    React.createElement(React.Fragment,null,
+      React.createElement(PersistentApp,null),
+      React.createElement(InstallBanner,null)
+    )
   );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Root,null));
